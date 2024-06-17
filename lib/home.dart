@@ -1,8 +1,5 @@
-// ignore_for_file: avoid_print
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:sample/AddActivityPage.dart';
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -10,32 +7,63 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  List<Map<String, String>> activities = [];
+
+  void _navigateToAddActivityPage() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AddActivityPage()),
+    );
+
+    if (result != null) {
+      setState(() {
+        activities
+            .add({'title': result['title']!, 'content': result['content']!});
+      });
+    }
+  }
+
+  void _deleteActivity(int index) {
+    setState(() {
+      activities.removeAt(index);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: Image.asset("public/images/how.png"),
         title: const Text(
-          "Hello Flutter",
-          style: TextStyle(fontSize: 20, color: Colors.white),
+          "Flutter To-do",
+          style: TextStyle(
+              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20.0),
         ),
-        backgroundColor: Colors.amberAccent,
+        centerTitle: true,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-           const Text("Cat"), 
-           const Text("Dog"), 
-           const Text("Bird"),
-            Container(
-              color: Colors.amber,
-              child: TextButton(onPressed: () => {
-                print("Hello Flutter"),
-              }, child: Text("Click here", style: TextStyle(color: Colors.black),),),
-              )
-            ],
-          
-        ),
+      body: ListView.builder(
+        itemCount: activities.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: Text(activities[index]['title']!),
+            subtitle: Text(activities[index]['content']!),
+            trailing: TextButton(
+              onPressed: () {
+                _deleteActivity(index);
+              },
+              child: Text('Delete',
+                  style: TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20)),
+            ),
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _navigateToAddActivityPage,
+        tooltip: 'Add Activity',
+        child: Icon(Icons.add),
       ),
     );
   }
